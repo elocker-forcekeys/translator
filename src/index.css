@@ -1,0 +1,317 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Assurer que les polices se chargent correctement */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Variables CSS pour la cohérence */
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --primary-color: #2563eb;
+  --secondary-color: #64748b;
+  --success-color: #059669;
+  --warning-color: #d97706;
+  --error-color: #dc2626;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  line-height: 1.6;
+  color: #1f2937;
+  background-color: #f9fafb;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Assurer que le contenu principal prend toute la hauteur */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Styles pour les boutons */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Styles pour les inputs */
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* Améliorer la lisibilité */
+.text-readable {
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* Classes utilitaires personnalisées */
+.shadow-soft {
+  box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Styles pour les états de focus améliorés */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Styles pour les cartes */
+.card-elevated {
+  @apply bg-white rounded-xl shadow-soft border border-gray-100;
+}
+
+/* Styles pour les gradients */
+.gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Animations personnalisées */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.5s ease-out;
+}
+
+/* Styles pour les notifications/toasts */
+.toast {
+  @apply fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg;
+}
+
+.toast-success {
+  @apply bg-green-500 text-white;
+}
+
+.toast-error {
+  @apply bg-red-500 text-white;
+}
+
+.toast-warning {
+  @apply bg-yellow-500 text-white;
+}
+
+.toast-info {
+  @apply bg-blue-500 text-white;
+}
+
+/* Styles pour les modales */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .container-mobile {
+    @apply px-4;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* Styles pour l'accessibilité */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Styles pour les états de chargement */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+.skeleton-text {
+  @apply h-4 bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-avatar {
+  @apply h-10 w-10 bg-gray-200 rounded-full animate-pulse;
+}
+
+/* Améliorer les scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Support pour les thèmes sombres */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Styles pour les liens */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #1d4ed8;
+}
+
+/* Styles pour les tableaux */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  font-weight: 600;
+  background-color: #f9fafb;
+}
+
+/* Styles pour les formulaires */
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 mb-2;
+}
+
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.form-error {
+  @apply text-red-600 text-sm mt-1;
+}
+
+/* Styles pour les badges */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-primary {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-error {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Assurer la visibilité du texte */
+.text-contrast {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles pour les états vides */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-12 text-center;
+}
+
+.empty-state-icon {
+  @apply w-16 h-16 text-gray-400 mb-4;
+}
+
+.empty-state-title {
+  @apply text-lg font-medium text-gray-900 mb-2;
+}
+
+.empty-state-description {
+  @apply text-gray-500 max-w-sm;
+}

@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Smooth transitions */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Focus states */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Loading animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Hover animations */
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200;
+}
+
+.card-hover {
+  @apply hover:shadow-md transition-shadow duration-200;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors;
+}
+
+/* Input styles */
+.input-field {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+/* Text styles */
+.text-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animation for progress bars */
+.progress-bar {
+  transition: width 0.3s ease;
+}
+
+/* Custom checkbox */
+.custom-checkbox {
+  @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive text sizes */
+@media (max-width: 640px) {
+  .responsive-text {
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 641px) {
+  .responsive-text {
+    font-size: 1rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
