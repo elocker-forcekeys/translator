@@ -1,11 +1,11 @@
 // Configuration API pour le domaine translate.forcekeys.com
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1',
-  TRANSLATION_API_URL: 'https://translateapi.forcekeys.com/translate',
+  BASE_URL: 'https://translateapi.forcekeys.com/api/v1',
+  TRANSLATION_API_URL: 'https://translateapi.forcekeys.com/api/v1/translate',
   ENDPOINTS: {
     // Auth
     LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
+    REGISTER: '/auth//register',
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
     PROFILE: '/auth/profile',

@@ -67,19 +67,18 @@ const TranslationTool: React.FC<TranslationToolProps> = ({ isLimited = false }) 
 
       if (response.success && response.data) {
         setTargetText(response.data.translation);
+        
+        // Mettre à jour le compteur de mots utilisés si l'utilisateur est connecté
+        if (user && response.data.wordCount) {
+          updateUser({ wordsUsed: user.wordsUsed + response.data.wordCount });
+        }
       } else {
-        throw new Error(response.message || 'Translation failed');
-      }
-      
-      // Mettre à jour le compteur de mots utilisés
-      if (user) {
-        const wordCount = sourceText.trim().split(/\s+/).length;
-        updateUser({ wordsUsed: user.wordsUsed + wordCount });
+        throw new Error(response.error || 'Erreur de traduction');
       }
       
     } catch (err) {
       console.error('Translation error:', err);
-      setError(t('translationError'));
+      setError(err instanceof Error ? err.message : 'Erreur de traduction');
     } finally {
       setIsTranslating(false);
     }

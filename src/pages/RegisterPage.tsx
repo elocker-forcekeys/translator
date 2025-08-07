@@ -38,7 +38,7 @@ const RegisterPage: React.FC = () => {
       await register(formData.email, formData.password, formData.name);
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la création du compte');
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'inscription');
     } finally {
       setLoading(false);
     }

@@ -78,11 +78,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         setUser(userData);
       } else {
-        throw new Error(response.message || 'Échec de la connexion');
+        throw new Error(response.error || 'Échec de la connexion');
       }
     } catch (error) {
       console.error('Erreur de connexion:', error);
-      throw new Error('Email ou mot de passe incorrect');
+      throw error;
     }
   };
 
@@ -99,11 +99,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         setUser(userData);
       } else {
-        throw new Error(response.message || 'Échec de l\'inscription');
+        throw new Error(response.error || 'Échec de l\'inscription');
       }
     } catch (error) {
       console.error('Erreur d\'inscription:', error);
-      throw new Error('Erreur lors de la création du compte');
+      throw error;
     }
   };
 
