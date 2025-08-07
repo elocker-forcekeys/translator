@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { API_CONFIG, ApiResponse, PaginatedResponse } from '../config/api';
 
 class ApiService {
@@ -36,7 +35,7 @@ class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP ${response.status}`);
+        throw new Error(data.error || data.message || `HTTP ${response.status}`);
       }
 
       return data;
@@ -49,113 +48,29 @@ class ApiService {
   // Auth methods
   async login(email: string, password: string): Promise<ApiResponse<{ user: any; token: string }>> {
     try {
-      const response = await this.request(API_CONFIG.ENDPOINTS.LOGIN, {
+      const response = await this.request<{ user: any; token: string }>(API_CONFIG.ENDPOINTS.LOGIN, {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
       
       return response;
     } catch (error) {
-      // En cas d'erreur réseau ou serveur indisponible, utiliser la simulation temporaire
-      console.warn('API non disponible, utilisation de la simulation:', error);
-      
-      // Simulation temporaire pour le développement
-      if (email === 'admin@translate.forcekeys.com' && password === 'admin123') {
-        return {
-          success: true,
-          data: {
-            user: {
-              id: '1',
-              email: 'admin@translate.forcekeys.com',
-              name: 'Administrator',
-              role: 'admin',
-              plan: 'enterprise',
-              wordsUsed: 0,
-              wordsLimit: -1,
-              apiKey: 'tr_admin_' + Math.random().toString(36).substr(2, 16),
-              emailVerified: true
-            },
-            token: 'mock_admin_token_' + Date.now()
-          }
-        };
-      }
-      
-      // Pour les autres utilisateurs, vérifier s'ils existent dans une liste prédéfinie
-      const mockUsers = [
-        { email: 'user@test.com', password: 'test123', name: 'Test User', role: 'user', plan: 'free' },
-        { email: 'pro@test.com', password: 'test123', name: 'Pro User', role: 'user', plan: 'pro' }
-      ];
-      
-      const mockUser = mockUsers.find(u => u.email === email && u.password === password);
-      
-      if (mockUser) {
-        return {
-          success: true,
-          data: {
-            user: {
-              id: Math.random().toString(36).substr(2, 9),
-              email: mockUser.email,
-              name: mockUser.name,
-              role: mockUser.role as 'user' | 'admin',
-              plan: mockUser.plan as 'free' | 'pro' | 'enterprise',
-              wordsUsed: 0,
-              wordsLimit: mockUser.plan === 'free' ? 2000 : mockUser.plan === 'pro' ? 100000 : -1,
-              apiKey: 'tr_' + Math.random().toString(36).substr(2, 32),
-              emailVerified: true
-            },
-            token: 'mock_token_' + Date.now()
-          }
-        };
-      }
-      
-      // Utilisateur non trouvé
-      return {
-        success: false,
-        error: 'Email ou mot de passe incorrect'
-      };
+      console.error('Login error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur de connexion');
     }
   }
 
   async register(email: string, password: string, name: string): Promise<ApiResponse<{ user: any; token: string }>> {
     try {
-      const response = await this.request(API_CONFIG.ENDPOINTS.REGISTER, {
+      const response = await this.request<{ user: any; token: string }>(API_CONFIG.ENDPOINTS.REGISTER, {
         method: 'POST',
         body: JSON.stringify({ email, password, name }),
       });
       
       return response;
     } catch (error) {
-      // Simulation temporaire pour le développement
-      console.warn('API non disponible, utilisation de la simulation:', error);
-      
-      // Vérifier si l'email existe déjà (simulation)
-      const existingEmails = ['admin@translate.forcekeys.com', 'user@test.com', 'pro@test.com'];
-      
-      if (existingEmails.includes(email)) {
-        return {
-          success: false,
-          error: 'Cet email est déjà utilisé'
-        };
-      }
-      
-      // Créer un nouvel utilisateur (simulation)
-      return {
-        success: true,
-        data: {
-          user: {
-            id: Math.random().toString(36).substr(2, 9),
-            email,
-            name,
-            role: 'user',
-            plan: 'free',
-            wordsUsed: 0,
-            wordsLimit: 2000,
-            apiKey: 'tr_' + Math.random().toString(36).substr(2, 32),
-            emailVerified: false
-          },
-          token: 'mock_token_' + Date.now()
-        }
-      };
+      console.error('Register error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la création du compte');
     }
   }
 
@@ -174,19 +89,8 @@ class ApiService {
     try {
       return await this.request(API_CONFIG.ENDPOINTS.PROFILE);
     } catch (error) {
-      // Si l'API n'est pas disponible, essayer de récupérer depuis le localStorage
-      const savedUser = localStorage.getItem('user');
-      if (savedUser) {
-        return {
-          success: true,
-          data: JSON.parse(savedUser)
-        };
-      }
-      
-      return {
-        success: false,
-        error: 'Utilisateur non trouvé'
-      };
+      console.error('Profile error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la récupération du profil');
     }
   }
 
@@ -197,77 +101,52 @@ class ApiService {
         body: JSON.stringify(data),
       });
     } catch (error) {
-      // Simulation de mise à jour réussie
-      return { success: true, data };
+      console.error('Update profile error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la mise à jour du profil');
     }
   }
-
 
   // Translation methods
+  async translate(data: {
+    text: string;
+    sourceLang: string;
+    targetLang: string;
+  }): Promise<ApiResponse<{ translation: string; wordCount: number; characterCount: number }>> {
+    try {
+      const response = await this.request<{ translation: string; wordCount: number; characterCount: number }>(API_CONFIG.ENDPOINTS.TRANSLATE, {
+        method: 'POST',
+        body: JSON.stringify({
+          text: data.text,
+          sourceLang: data.sourceLang,
+          targetLang: data.targetLang
+        }),
+      });
 
-
-
-async translate(data: {
-  text: string;
-  sourceLang: string;
-  targetLang: string;
-}): Promise<ApiResponse<{ translation: string; detectedLanguage?: string }>> {
-  try {
-    const response = await axios.post(API_CONFIG.TRANSLATION_API_URL, {
-      text: data.text,
-      sourceLang: data.sourceLang,
-      targetLang: data.targetLang
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.getAuthHeaders()
-      },
-      timeout: 10000 // 10 secondes timeout
-    });
-
-    return {
-      success: true,
-      data: {
-        translation: response.data.translation,
-        detectedLanguage: response.data.detected_language
-      }
-    };
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return {
-        success: false,
-        error: error.response?.data?.message || error.message,
-        status: error.response?.status
-      };
+      return response;
+    } catch (error) {
+      console.error('Translation error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la traduction');
     }
-    return {
-      success: false,
-      error: 'Unknown error'
-    };
   }
-}
 
-
-
-
-
-
-
-
-// OCR
   async translateOCR(formData: FormData): Promise<ApiResponse<{ 
     extractedText: string; 
     translation: string; 
     processedImage?: string;
   }>> {
-    return this.request(API_CONFIG.ENDPOINTS.OCR, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        ...this.getAuthHeaders(),
-        // Don't set Content-Type for FormData
-      },
-    });
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.OCR, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          ...this.getAuthHeaders(),
+          // Don't set Content-Type for FormData
+        },
+      });
+    } catch (error) {
+      console.error('OCR error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors du traitement de l\'image');
+    }
   }
 
   async translatePDF(formData: FormData): Promise<ApiResponse<{ 
@@ -275,13 +154,18 @@ async translate(data: {
     originalText: string; 
     translatedText: string;
   }>> {
-    return this.request(API_CONFIG.ENDPOINTS.PDF, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        ...this.getAuthHeaders(),
-      },
-    });
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.PDF, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          ...this.getAuthHeaders(),
+        },
+      });
+    } catch (error) {
+      console.error('PDF error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors du traitement du PDF');
+    }
   }
 
   async getSupportedLanguages(): Promise<ApiResponse<Array<{
@@ -289,11 +173,42 @@ async translate(data: {
     name: string;
     flag: string;
   }>>> {
-    return this.request(API_CONFIG.ENDPOINTS.LANGUAGES);
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.LANGUAGES);
+    } catch (error) {
+      // En cas d'erreur, retourner les langues par défaut
+      return {
+        success: true,
+        data: [
+          { code: 'auto', name: 'Auto-detect', flag: '🌐' },
+          { code: 'en', name: 'English', flag: '🇺🇸' },
+          { code: 'fr', name: 'Français', flag: '🇫🇷' },
+          { code: 'es', name: 'Español', flag: '🇪🇸' },
+          { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+          { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+          { code: 'pt', name: 'Português', flag: '🇵🇹' },
+          { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+          { code: 'ja', name: '日本語', flag: '🇯🇵' },
+          { code: 'ko', name: '한국어', flag: '🇰🇷' },
+          { code: 'zh', name: '中文', flag: '🇨🇳' },
+          { code: 'ar', name: 'العربية', flag: '🇸🇦' }
+        ]
+      };
+    }
   }
 
   async getTranslationHistory(page = 1, limit = 20): Promise<PaginatedResponse<any>> {
-    return this.request(`${API_CONFIG.ENDPOINTS.HISTORY}?page=${page}&limit=${limit}`);
+    try {
+      return await this.request(`${API_CONFIG.ENDPOINTS.HISTORY}?page=${page}&limit=${limit}`);
+    } catch (error) {
+      console.error('History error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur lors de la récupération de l\'historique',
+        data: [],
+        pagination: { page, limit, total: 0, totalPages: 0 }
+      };
+    }
   }
 
   // User methods
@@ -303,7 +218,12 @@ async translate(data: {
     requestsThisMonth: number;
     requestsLimit: number;
   }>> {
-    return this.request(API_CONFIG.ENDPOINTS.USAGE);
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.USAGE);
+    } catch (error) {
+      console.error('Usage error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la récupération des statistiques');
+    }
   }
 
   async getSubscription(): Promise<ApiResponse<{
@@ -312,7 +232,12 @@ async translate(data: {
     renewsAt: string;
     features: string[];
   }>> {
-    return this.request(API_CONFIG.ENDPOINTS.SUBSCRIPTION);
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.SUBSCRIPTION);
+    } catch (error) {
+      console.error('Subscription error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la récupération de l\'abonnement');
+    }
   }
 
   // Admin methods
@@ -322,18 +247,38 @@ async translate(data: {
     revenueThisMonth: number;
     conversionRate: number;
   }>> {
-    return this.request(API_CONFIG.ENDPOINTS.ADMIN_STATS);
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.ADMIN_STATS);
+    } catch (error) {
+      console.error('Admin stats error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la récupération des statistiques admin');
+    }
   }
 
   async getAdminUsers(page = 1, limit = 20): Promise<PaginatedResponse<any>> {
-    return this.request(`${API_CONFIG.ENDPOINTS.ADMIN_USERS}?page=${page}&limit=${limit}`);
+    try {
+      return await this.request(`${API_CONFIG.ENDPOINTS.ADMIN_USERS}?page=${page}&limit=${limit}`);
+    } catch (error) {
+      console.error('Admin users error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur lors de la récupération des utilisateurs',
+        data: [],
+        pagination: { page, limit, total: 0, totalPages: 0 }
+      };
+    }
   }
 
   async updateAdminSettings(settings: any): Promise<ApiResponse> {
-    return this.request(API_CONFIG.ENDPOINTS.ADMIN_SETTINGS, {
-      method: 'PUT',
-      body: JSON.stringify(settings),
-    });
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.ADMIN_SETTINGS, {
+        method: 'PUT',
+        body: JSON.stringify(settings),
+      });
+    } catch (error) {
+      console.error('Admin settings error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la mise à jour des paramètres');
+    }
   }
 
   // Billing methods
@@ -344,7 +289,38 @@ async translate(data: {
     features: string[];
     wordsLimit: number;
   }>>> {
-    return this.request(API_CONFIG.ENDPOINTS.PLANS);
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.PLANS);
+    } catch (error) {
+      console.error('Plans error:', error);
+      // Retourner les plans par défaut en cas d'erreur
+      return {
+        success: true,
+        data: [
+          {
+            id: 'free',
+            name: 'Gratuit',
+            price: 0,
+            wordsLimit: 2000,
+            features: ['2000 words/month', 'Basic text translation', 'Email support', 'Web access only']
+          },
+          {
+            id: 'pro',
+            name: 'Pro',
+            price: 19,
+            wordsLimit: 100000,
+            features: ['100K words/month', 'Text, image, PDF translation', 'Priority support', 'API access', 'Unlimited history']
+          },
+          {
+            id: 'enterprise',
+            name: 'Enterprise',
+            price: 99,
+            wordsLimit: -1,
+            features: ['Unlimited words', 'All Pro features', '24/7 dedicated support', 'High-performance API', 'Custom integrations', 'Team dashboard', '99.9% SLA']
+          }
+        ]
+      };
+    }
   }
 
   async getBillingHistory(): Promise<ApiResponse<Array<{
@@ -354,17 +330,31 @@ async translate(data: {
     status: string;
     description: string;
   }>>> {
-    return this.request(API_CONFIG.ENDPOINTS.BILLING);
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.BILLING);
+    } catch (error) {
+      console.error('Billing history error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur lors de la récupération de l\'historique de facturation',
+        data: []
+      };
+    }
   }
 
   async createPayment(planId: string): Promise<ApiResponse<{
     paymentUrl: string;
     sessionId: string;
   }>> {
-    return this.request(API_CONFIG.ENDPOINTS.PAYMENT, {
-      method: 'POST',
-      body: JSON.stringify({ planId }),
-    });
+    try {
+      return await this.request(API_CONFIG.ENDPOINTS.PAYMENT, {
+        method: 'POST',
+        body: JSON.stringify({ planId }),
+      });
+    } catch (error) {
+      console.error('Payment error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de la création du paiement');
+    }
   }
 
   // File upload helper
@@ -378,13 +368,18 @@ async translate(data: {
       });
     }
 
-    return this.request(endpoint, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        ...this.getAuthHeaders(),
-      },
-    });
+    try {
+      return await this.request(endpoint, 
+        method: 'POST',
+        body: formData,
+        headers: {
+          ...this.getAuthHeaders(),
+        },
+      });
+    } catch (error) {
+      console.error('File upload error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Erreur lors de l\'upload du fichier');
+    }
   }
 }
 
