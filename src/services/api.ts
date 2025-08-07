@@ -368,8 +368,9 @@ class ApiService {
       });
     }
 
+    
     try {
-      return await this.request(endpoint, 
+      return await this.request(endpoint, {
         method: 'POST',
         body: formData,
         headers: {
